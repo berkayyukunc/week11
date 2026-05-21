@@ -23,7 +23,6 @@ class MyApp extends StatelessWidget {
             seedColor: Colors.cyan,
             brightness: Brightness.dark,
           ),
-          fontFamily: 'SF Pro Display',
         ),
         home: MyHomePage(),
       ),
@@ -74,6 +73,63 @@ class _MyHomePageState extends State<MyHomePage> {
     }
 
     return LayoutBuilder(builder: (context, constraints) {
+      // Mobile layout (narrow screen)
+      if (constraints.maxWidth < 600) {
+        return Scaffold(
+          body: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Color(0xFF0D0D1A),
+                  Color(0xFF1A1A2E),
+                  Color(0xFF16213E),
+                ],
+              ),
+            ),
+            child: page,
+          ),
+          bottomNavigationBar: Container(
+            decoration: BoxDecoration(
+              color: Color(0xFF0D0D1A),
+              border: Border(
+                top: BorderSide(
+                  color: Colors.cyanAccent.withOpacity(0.15),
+                  width: 1,
+                ),
+              ),
+            ),
+            child: NavigationBar(
+              backgroundColor: Colors.transparent,
+              indicatorColor: Colors.cyanAccent.withOpacity(0.15),
+              selectedIndex: selectedIndex,
+              onDestinationSelected: (value) {
+                setState(() {
+                  selectedIndex = value;
+                });
+              },
+              destinations: [
+                NavigationDestination(
+                  icon: Icon(Icons.auto_awesome_outlined,
+                      color: Colors.white38),
+                  selectedIcon:
+                      Icon(Icons.auto_awesome, color: Colors.cyanAccent),
+                  label: 'Generate',
+                ),
+                NavigationDestination(
+                  icon: Icon(Icons.favorite_border, color: Colors.white38),
+                  selectedIcon:
+                      Icon(Icons.favorite, color: Colors.pinkAccent),
+                  label: 'Favorites',
+                ),
+              ],
+            ),
+          ),
+        );
+      }
+
+      // Desktop layout (wide screen)
       return Scaffold(
         body: Container(
           decoration: BoxDecoration(
@@ -92,7 +148,7 @@ class _MyHomePageState extends State<MyHomePage> {
               SafeArea(
                 child: NavigationRail(
                   backgroundColor: Colors.transparent,
-                  extended: constraints.maxWidth >= 600,
+                  extended: constraints.maxWidth >= 800,
                   indicatorColor: Colors.cyan.withOpacity(0.2),
                   selectedIconTheme: IconThemeData(
                     color: Colors.cyanAccent,
@@ -103,21 +159,17 @@ class _MyHomePageState extends State<MyHomePage> {
                       ),
                     ],
                   ),
-                  unselectedIconTheme: IconThemeData(
-                    color: Colors.white38,
-                  ),
+                  unselectedIconTheme:
+                      IconThemeData(color: Colors.white38),
                   selectedLabelTextStyle: TextStyle(
                     color: Colors.cyanAccent,
                     fontWeight: FontWeight.bold,
-                    fontSize: 13,
                   ),
-                  unselectedLabelTextStyle: TextStyle(
-                    color: Colors.white38,
-                    fontSize: 12,
-                  ),
+                  unselectedLabelTextStyle:
+                      TextStyle(color: Colors.white38),
                   destinations: [
                     NavigationRailDestination(
-                      icon: Icon(Icons.auto_awesome),
+                      icon: Icon(Icons.auto_awesome_outlined),
                       selectedIcon: Icon(Icons.auto_awesome),
                       label: Text('Generate'),
                     ),
@@ -135,12 +187,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   },
                 ),
               ),
-              Expanded(
-                child: AnimatedSwitcher(
-                  duration: Duration(milliseconds: 300),
-                  child: page,
-                ),
-              ),
+              Expanded(child: page),
             ],
           ),
         ),
@@ -163,55 +210,56 @@ class GeneratorPage extends StatelessWidget {
     }
 
     return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            '✨ WORD GENERATOR',
-            style: TextStyle(
-              color: Colors.white24,
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-              letterSpacing: 4,
-            ),
-          ),
-          SizedBox(height: 30),
-          BigCard(pair: pair),
-          SizedBox(height: 30),
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              _buildNeonButton(
-                onPressed: () {
-                  appState.toggleFavorite();
-                },
-                icon: Icon(icon, size: 20),
-                label: 'Like',
-                isActive: appState.favorites.contains(pair),
-                activeColor: Colors.pinkAccent,
-              ),
-              SizedBox(width: 16),
-              _buildNeonButton(
-                onPressed: () {
-                  appState.getNext();
-                },
-                icon: Icon(Icons.skip_next_rounded, size: 20),
-                label: 'Next',
-                isActive: false,
-                activeColor: Colors.cyanAccent,
-              ),
-            ],
-          ),
-          SizedBox(height: 40),
-          if (appState.favorites.isNotEmpty)
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
             Text(
-              '${appState.favorites.length} word${appState.favorites.length > 1 ? 's' : ''} saved',
+              '✨ WORD GENERATOR',
               style: TextStyle(
                 color: Colors.white24,
-                fontSize: 12,
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 4,
               ),
             ),
-        ],
+            SizedBox(height: 30),
+            BigCard(pair: pair),
+            SizedBox(height: 30),
+            Wrap(
+              alignment: WrapAlignment.center,
+              spacing: 12,
+              runSpacing: 12,
+              children: [
+                _buildNeonButton(
+                  onPressed: () {
+                    appState.toggleFavorite();
+                  },
+                  icon: Icon(icon, size: 18),
+                  label: 'Like',
+                  isActive: appState.favorites.contains(pair),
+                  activeColor: Colors.pinkAccent,
+                ),
+                _buildNeonButton(
+                  onPressed: () {
+                    appState.getNext();
+                  },
+                  icon: Icon(Icons.skip_next_rounded, size: 18),
+                  label: 'Next',
+                  isActive: false,
+                  activeColor: Colors.cyanAccent,
+                ),
+              ],
+            ),
+            SizedBox(height: 30),
+            if (appState.favorites.isNotEmpty)
+              Text(
+                '${appState.favorites.length} word${appState.favorites.length > 1 ? 's' : ''} saved',
+                style: TextStyle(color: Colors.white24, fontSize: 12),
+              ),
+          ],
+        ),
       ),
     );
   }
@@ -237,7 +285,6 @@ class GeneratorPage extends StatelessWidget {
                 BoxShadow(
                   color: activeColor.withOpacity(0.2),
                   blurRadius: 12,
-                  spreadRadius: 0,
                 ),
               ]
             : [],
@@ -251,7 +298,7 @@ class GeneratorPage extends StatelessWidget {
           onTap: onPressed,
           borderRadius: BorderRadius.circular(16),
           child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -305,7 +352,6 @@ class BigCard extends StatelessWidget {
           BoxShadow(
             color: Colors.cyanAccent.withOpacity(0.1),
             blurRadius: 30,
-            spreadRadius: 0,
           ),
           BoxShadow(
             color: Colors.purpleAccent.withOpacity(0.05),
@@ -315,11 +361,11 @@ class BigCard extends StatelessWidget {
         ],
       ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 28),
+        padding: const EdgeInsets.symmetric(horizontal: 36, vertical: 24),
         child: Text(
           pair.asLowerCase,
           style: TextStyle(
-            fontSize: 38,
+            fontSize: 32,
             fontWeight: FontWeight.w300,
             color: Colors.white,
             letterSpacing: 2,
@@ -347,122 +393,110 @@ class FavoritesPage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.favorite_border,
-              size: 48,
-              color: Colors.white12,
-            ),
+            Icon(Icons.favorite_border, size: 48, color: Colors.white12),
             SizedBox(height: 16),
             Text(
               'No favorites yet',
-              style: TextStyle(
-                color: Colors.white24,
-                fontSize: 16,
-              ),
+              style: TextStyle(color: Colors.white24, fontSize: 16),
             ),
             SizedBox(height: 8),
             Text(
               'Tap the Like button to save words',
-              style: TextStyle(
-                color: Colors.white12,
-                fontSize: 13,
-              ),
+              style: TextStyle(color: Colors.white12, fontSize: 13),
             ),
           ],
         ),
       );
     }
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(24, 40, 24, 16),
-          child: Row(
-            children: [
-              Icon(Icons.favorite, color: Colors.pinkAccent, size: 20),
-              SizedBox(width: 10),
-              Text(
-                'Favorites',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 22,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              SizedBox(width: 10),
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                decoration: BoxDecoration(
-                  color: Colors.pinkAccent.withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: Colors.pinkAccent.withOpacity(0.3),
-                  ),
-                ),
-                child: Text(
-                  '${appState.favorites.length}',
+    return SafeArea(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
+            child: Row(
+              children: [
+                Icon(Icons.favorite, color: Colors.pinkAccent, size: 20),
+                SizedBox(width: 10),
+                Text(
+                  'Favorites',
                   style: TextStyle(
-                    color: Colors.pinkAccent,
-                    fontSize: 13,
-                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                    fontSize: 22,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
-              ),
-            ],
-          ),
-        ),
-        Expanded(
-          child: ListView.builder(
-            padding: EdgeInsets.symmetric(horizontal: 16),
-            itemCount: appState.favorites.length,
-            itemBuilder: (context, index) {
-              var pair = appState.favorites[index];
-              return Container(
-                margin: EdgeInsets.only(bottom: 8),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(16),
-                  color: Colors.white.withOpacity(0.05),
-                  border: Border.all(
-                    color: Colors.white.withOpacity(0.08),
-                  ),
-                ),
-                child: ListTile(
-                  contentPadding: EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 4,
-                  ),
-                  leading: Container(
-                    padding: EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.pinkAccent.withOpacity(0.1),
-                    ),
-                    child: Icon(
-                      Icons.favorite,
-                      color: Colors.pinkAccent,
-                      size: 18,
+                SizedBox(width: 10),
+                Container(
+                  padding:
+                      EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.pinkAccent.withOpacity(0.15),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: Colors.pinkAccent.withOpacity(0.3),
                     ),
                   ),
-                  title: Text(
-                    pair.asLowerCase,
+                  child: Text(
+                    '${appState.favorites.length}',
                     style: TextStyle(
-                      color: Colors.white70,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w400,
-                      letterSpacing: 1,
+                      color: Colors.pinkAccent,
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
-                  trailing: Icon(
-                    Icons.chevron_right,
-                    color: Colors.white12,
-                  ),
                 ),
-              );
-            },
+              ],
+            ),
           ),
-        ),
-      ],
+          Expanded(
+            child: ListView.builder(
+              padding: EdgeInsets.symmetric(horizontal: 16),
+              itemCount: appState.favorites.length,
+              itemBuilder: (context, index) {
+                var pair = appState.favorites[index];
+                return Container(
+                  margin: EdgeInsets.only(bottom: 8),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(16),
+                    color: Colors.white.withOpacity(0.05),
+                    border: Border.all(
+                      color: Colors.white.withOpacity(0.08),
+                    ),
+                  ),
+                  child: ListTile(
+                    contentPadding: EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 4,
+                    ),
+                    leading: Container(
+                      padding: EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.pinkAccent.withOpacity(0.1),
+                      ),
+                      child: Icon(
+                        Icons.favorite,
+                        color: Colors.pinkAccent,
+                        size: 18,
+                      ),
+                    ),
+                    title: Text(
+                      pair.asLowerCase,
+                      style: TextStyle(
+                        color: Colors.white70,
+                        fontSize: 16,
+                        letterSpacing: 1,
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

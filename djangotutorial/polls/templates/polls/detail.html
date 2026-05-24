@@ -1,12 +1,44 @@
-<form action="{% url 'polls:vote' question.id %}" method="post">
-{% csrf_token %}
-<fieldset>
-    <legend><h1>{{ question.question_text }}</h1></legend>
-    {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
-    {% for choice in question.choice_set.all %}
-        <input type="radio" name="choice" id="choice{{ forloop.counter }}" value="{{ choice.id }}">
-        <label for="choice{{ forloop.counter }}">{{ choice.choice_text }}</label><br>
-    {% endfor %}
-</fieldset>
-<input type="submit" value="Vote">
-</form>
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Polls | Vote</title>
+    <link rel="stylesheet" href="{% static 'polls/style.css' %}">
+</head>
+<body>
+    <div class="app-container">
+        <p class="header-subtitle">✨ Cast Your Vote</p>
+        <h1 class="question-title">{{ question.question_text }}</h1>
+
+        {% if error_message %}
+            <div class="error-banner">
+                <span>⚠️</span>
+                <strong>{{ error_message }}</strong>
+            </div>
+        {% endif %}
+
+        <form action="{% url 'polls:vote' question.id %}" method="post">
+            {% csrf_token %}
+            <fieldset>
+                <div class="choice-container">
+                    {% for choice in question.choice_set.all %}
+                        <div class="choice-item">
+                            <input type="radio" name="choice" id="choice{{ forloop.counter }}" value="{{ choice.id }}" class="choice-radio">
+                            <label for="choice{{ forloop.counter }}" class="choice-label">
+                                {{ choice.choice_text }}
+                            </label>
+                        </div>
+                    {% endfor %}
+                </div>
+            </fieldset>
+            <input type="submit" value="Vote" class="btn-submit">
+        </form>
+
+        <div class="actions-container">
+            <a href="{% url 'polls:index' %}" class="btn-secondary">Back to Polls</a>
+        </div>
+    </div>
+</body>
+</html>

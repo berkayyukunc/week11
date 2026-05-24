@@ -1,9 +1,66 @@
-<h1>{{ question.question_text }}</h1>
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Polls | Results</title>
+    <link rel="stylesheet" href="{% static 'polls/style.css' %}">
+</head>
+<body>
+    <div class="app-container">
+        <p class="header-subtitle">✨ Current Results</p>
+        <h1 class="question-title">{{ question.question_text }}</h1>
 
-<ul>
-{% for choice in question.choice_set.all %}
-    <li>{{ choice.choice_text }} -- {{ choice.votes }} vote{{ choice.votes|pluralize }}</li>
-{% endfor %}
-</ul>
+        <ul class="results-list">
+            {% for choice in question.choice_set.all %}
+                <li class="result-item" data-votes="{{ choice.votes }}">
+                    <div class="result-info">
+                        <span class="result-text">{{ choice.choice_text }}</span>
+                        <span class="result-votes">
+                            <span class="vote-count">{{ choice.votes }}</span> vote{{ choice.votes|pluralize }}
+                        </span>
+                    </div>
+                    <div class="progress-container">
+                        <div class="progress-bar" style="width: 0%"></div>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
 
-<a href="{% url 'polls:detail' question.id %}">Vote again?</a>
+        <div class="actions-container">
+            <a href="{% url 'polls:detail' question.id %}" class="btn-primary-outline">Vote again?</a>
+            <a href="{% url 'polls:index' %}" class="btn-secondary">Back to Polls</a>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const items = document.querySelectorAll('.result-item');
+            let totalVotes = 0;
+            items.forEach(item => {
+                totalVotes += parseInt(item.getAttribute('data-votes') || '0', 10);
+            });
+
+            items.forEach(item => {
+                const votes = parseInt(item.getAttribute('data-votes') || '0', 10);
+                const progressBar = item.querySelector('.progress-bar');
+                const voteCountSpan = item.querySelector('.vote-count');
+                
+                const percentage = totalVotes > 0 ? Math.round((votes / totalVotes) * 100) : 0;
+                
+                // Animate progress bar width
+                setTimeout(() => {
+                    progressBar.style.width = `${percentage}%`;
+                }, 100);
+                
+                // Append percentage to the votes label
+                const votesLabel = item.querySelector('.result-votes');
+                if (totalVotes > 0) {
+                    votesLabel.innerHTML = `${percentage}% (${votes} vote${votes === 1 ? '' : 's'})`;
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+# Python compilation cache
+**/__pycache__/
+*.py[cod]
+*$py.class
+djangotutorial/db.sqlite3-journal
+
+# Flutter / Dart build and package caches
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+**/build/
+
+# OS files
+.DS_Store

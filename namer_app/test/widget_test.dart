@@ -11,20 +11,22 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:namer_app/main.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
+  testWidgets('Namer App smoke test', (WidgetTester tester) async {
     // Build our app and trigger a frame.
     await tester.pumpWidget(const MyApp());
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    // Verify that the Word Generator title is shown.
+    expect(find.text('✨ WORD GENERATOR'), findsOneWidget);
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
+    // Verify that 'Like' and 'Next' buttons are present.
+    expect(find.text('Like'), findsOneWidget);
+    expect(find.text('Next'), findsOneWidget);
+
+    // Verify that a BigCard is present.
+    expect(find.byType(BigCard), findsOneWidget);
+
+    // Tap the 'Next' button and trigger a frame.
+    await tester.tap(find.text('Next'));
     await tester.pump();
-
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
   });
 }
